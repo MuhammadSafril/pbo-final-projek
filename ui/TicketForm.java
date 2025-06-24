@@ -18,27 +18,35 @@ public class TicketForm extends JFrame {
     private ArrayList<Route> routeList;
 
     public TicketForm() {
-        setTitle("Pesan Tiket Bus");
-        setSize(400, 200);
+        setTitle("🎫 Pemesanan Tiket Bus");
+        setSize(500, 250);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(new Color(245, 248, 255));
 
-        // Form
-        JPanel formPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        // === Panel Form ===
+        JPanel formPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 30));
+        formPanel.setBackground(new Color(245, 248, 255));
+
         tfPassenger = new JTextField();
         cbRoutes = new JComboBox<>();
 
-        formPanel.add(new JLabel("Nama Penumpang:"));
+        tfPassenger.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cbRoutes.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        formPanel.add(new JLabel("👤 Nama Penumpang:"));
         formPanel.add(tfPassenger);
-        formPanel.add(new JLabel("Pilih Rute:"));
+        formPanel.add(new JLabel("🚌 Pilih Rute:"));
         formPanel.add(cbRoutes);
 
-        // Tombol
-        btnOrder = new JButton("Pesan Tiket");
-        btnBack = new JButton("Kembali");
+        // === Tombol ===
+        btnOrder = createButton("Pesan Tiket", new Color(34, 197, 94));
+        btnBack = createButton("Kembali", new Color(156, 163, 175));
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(245, 248, 255));
         buttonPanel.add(btnOrder);
         buttonPanel.add(btnBack);
 
@@ -47,13 +55,13 @@ public class TicketForm extends JFrame {
 
         loadRoutes();
 
-        // Event tombol
+        // === Event tombol ===
         btnOrder.addActionListener(e -> {
             String name = tfPassenger.getText().trim();
             int selected = cbRoutes.getSelectedIndex();
 
             if (name.isEmpty() || selected < 0) {
-                JOptionPane.showMessageDialog(this, "Isi nama dan pilih rute.");
+                JOptionPane.showMessageDialog(this, "⚠️ Isi nama dan pilih rute terlebih dahulu.");
                 return;
             }
 
@@ -61,10 +69,10 @@ public class TicketForm extends JFrame {
             Ticket ticket = new Ticket(name, routeId, LocalDateTime.now());
 
             if (TicketController.addTicket(ticket)) {
-                JOptionPane.showMessageDialog(this, "Tiket berhasil dipesan!");
+                JOptionPane.showMessageDialog(this, "✅ Tiket berhasil dipesan!");
                 tfPassenger.setText("");
             } else {
-                JOptionPane.showMessageDialog(this, "Gagal memesan tiket.");
+                JOptionPane.showMessageDialog(this, "❌ Gagal memesan tiket.");
             }
         });
 
@@ -85,5 +93,15 @@ public class TicketForm extends JFrame {
                 r.getDepartureTime().format(formatter)
             );
         }
+    }
+
+    private JButton createButton(String text, Color color) {
+        JButton btn = new JButton(text);
+        btn.setBackground(color);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(130, 35));
+        return btn;
     }
 }

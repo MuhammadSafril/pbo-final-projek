@@ -19,8 +19,8 @@ public class BusForm extends JFrame {
     private int selectedBusId = -1;
 
     public BusForm() {
-        setTitle("Manajemen Data Bus");
-        setSize(600, 400);
+        setTitle("🚌 Manajemen Data Bus");
+        setSize(700, 450);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -28,6 +28,8 @@ public class BusForm extends JFrame {
         // === Tabel ===
         tableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Tipe", "Kursi"}, 0);
         table = new JTable(tableModel);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setRowHeight(24);
         JScrollPane scrollPane = new JScrollPane(table);
 
         // === Komponen Form ===
@@ -35,7 +37,14 @@ public class BusForm extends JFrame {
         cbType = new JComboBox<>(new String[]{"Ekonomi", "Bisnis", "Eksekutif"});
         spSeats = new JSpinner(new SpinnerNumberModel(30, 10, 100, 1));
 
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+        cbName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cbType.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        spSeats.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        JPanel formPanel = new JPanel(new GridLayout(4, 2, 8, 8));
+        formPanel.setBackground(new Color(240, 248, 255));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
         formPanel.add(new JLabel("Nama Bus:"));
         formPanel.add(cbName);
         formPanel.add(new JLabel("Tipe Bus:"));
@@ -44,12 +53,13 @@ public class BusForm extends JFrame {
         formPanel.add(spSeats);
 
         // === Tombol ===
-        btnAdd = new JButton("Tambah");
-        btnUpdate = new JButton("Ubah");
-        btnDelete = new JButton("Hapus");
-        btnBack = new JButton("Kembali");
+        btnAdd = createButton("Tambah", new Color(59, 130, 246));
+        btnUpdate = createButton("Ubah", new Color(34, 197, 94));
+        btnDelete = createButton("Hapus", new Color(239, 68, 68));
+        btnBack = createButton("Kembali", new Color(156, 163, 175));
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnUpdate);
         buttonPanel.add(btnDelete);
@@ -83,7 +93,7 @@ public class BusForm extends JFrame {
                     (Integer) spSeats.getValue()
             );
             if (BusController.addBus(bus)) {
-                JOptionPane.showMessageDialog(this, "Bus berhasil ditambahkan!");
+                JOptionPane.showMessageDialog(this, "✅ Bus berhasil ditambahkan!");
                 loadTable();
                 clearForm();
             }
@@ -98,7 +108,7 @@ public class BusForm extends JFrame {
                         (Integer) spSeats.getValue()
                 );
                 if (BusController.updateBus(bus)) {
-                    JOptionPane.showMessageDialog(this, "Bus berhasil diperbarui!");
+                    JOptionPane.showMessageDialog(this, "✅ Bus berhasil diperbarui!");
                     loadTable();
                     clearForm();
                 }
@@ -107,10 +117,10 @@ public class BusForm extends JFrame {
 
         btnDelete.addActionListener(e -> {
             if (selectedBusId != -1) {
-                int confirm = JOptionPane.showConfirmDialog(this, "Yakin ingin menghapus?");
+                int confirm = JOptionPane.showConfirmDialog(this, "Yakin ingin menghapus data ini?");
                 if (confirm == 0) {
                     if (BusController.deleteBus(selectedBusId)) {
-                        JOptionPane.showMessageDialog(this, "Bus berhasil dihapus!");
+                        JOptionPane.showMessageDialog(this, "🗑️ Bus berhasil dihapus!");
                         loadTable();
                         clearForm();
                     }
@@ -122,6 +132,16 @@ public class BusForm extends JFrame {
             dispose();
             new MainMenu().setVisible(true);
         });
+    }
+
+    private JButton createButton(String text, Color color) {
+        JButton btn = new JButton(text);
+        btn.setBackground(color);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(100, 35));
+        return btn;
     }
 
     private void loadTable() {

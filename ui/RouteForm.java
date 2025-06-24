@@ -25,25 +25,37 @@ public class RouteForm extends JFrame {
     private ArrayList<Bus> busList = new ArrayList<>();
 
     public RouteForm() {
-        setTitle("Manajemen Rute Bus");
-        setSize(750, 450);
+        setTitle("🗺️ Manajemen Rute Bus");
+        setSize(800, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Tabel
+        // === Tabel ===
         tableModel = new DefaultTableModel(new String[]{"ID", "Asal", "Tujuan", "Waktu", "Harga", "Bus"}, 0);
         table = new JTable(tableModel);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setRowHeight(24);
         JScrollPane scrollPane = new JScrollPane(table);
 
-        // Form
+        // === Form Input ===
         cbOrigin = new JComboBox<>(new String[]{"Jakarta", "Bandung", "Yogyakarta", "Surabaya", "Semarang"});
         cbDestination = new JComboBox<>(new String[]{"Jakarta", "Bandung", "Yogyakarta", "Surabaya", "Semarang"});
         tfDeparture = new JTextField(); // format: yyyy-MM-dd HH:mm
         spPrice = new JSpinner(new SpinnerNumberModel(100000, 50000, 1000000, 10000));
         cbBus = new JComboBox<>();
 
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 5, 5));
+        Font inputFont = new Font("Segoe UI", Font.PLAIN, 14);
+        cbOrigin.setFont(inputFont);
+        cbDestination.setFont(inputFont);
+        tfDeparture.setFont(inputFont);
+        spPrice.setFont(inputFont);
+        cbBus.setFont(inputFont);
+
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 8, 8));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        formPanel.setBackground(new Color(250, 250, 255));
+
         formPanel.add(new JLabel("Asal:"));
         formPanel.add(cbOrigin);
         formPanel.add(new JLabel("Tujuan:"));
@@ -55,13 +67,14 @@ public class RouteForm extends JFrame {
         formPanel.add(new JLabel("Bus:"));
         formPanel.add(cbBus);
 
-        // Tombol
-        btnAdd = new JButton("Tambah");
-        btnUpdate = new JButton("Ubah");
-        btnDelete = new JButton("Hapus");
-        btnBack = new JButton("Kembali");
+        // === Tombol ===
+        btnAdd = createButton("Tambah", new Color(59, 130, 246));
+        btnUpdate = createButton("Ubah", new Color(34, 197, 94));
+        btnDelete = createButton("Hapus", new Color(239, 68, 68));
+        btnBack = createButton("Kembali", new Color(156, 163, 175));
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnUpdate);
         buttonPanel.add(btnDelete);
@@ -77,7 +90,7 @@ public class RouteForm extends JFrame {
         loadBuses();
         loadTable();
 
-        // Tabel klik
+        // === Event Klik Tabel ===
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int row = table.getSelectedRow();
@@ -90,43 +103,41 @@ public class RouteForm extends JFrame {
             }
         });
 
-        // Tambah
+        // === Event Tombol ===
         btnAdd.addActionListener(e -> {
             try {
                 Route route = getRouteFromForm(false);
                 if (RouteController.addRoute(route)) {
-                    JOptionPane.showMessageDialog(this, "Rute ditambahkan!");
+                    JOptionPane.showMessageDialog(this, "✅ Rute ditambahkan!");
                     loadTable();
                     clearForm();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Input tidak valid: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "⚠️ Input tidak valid: " + ex.getMessage());
             }
         });
 
-        // Update
         btnUpdate.addActionListener(e -> {
             try {
                 if (selectedRouteId != -1) {
                     Route route = getRouteFromForm(true);
                     route.setId(selectedRouteId);
                     if (RouteController.updateRoute(route)) {
-                        JOptionPane.showMessageDialog(this, "Rute diperbarui!");
+                        JOptionPane.showMessageDialog(this, "✅ Rute diperbarui!");
                         loadTable();
                         clearForm();
                     }
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Input tidak valid: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "⚠️ Input tidak valid: " + ex.getMessage());
             }
         });
 
-        // Hapus
         btnDelete.addActionListener(e -> {
             if (selectedRouteId != -1) {
                 int confirm = JOptionPane.showConfirmDialog(this, "Yakin ingin menghapus?");
                 if (confirm == 0 && RouteController.deleteRoute(selectedRouteId)) {
-                    JOptionPane.showMessageDialog(this, "Rute dihapus!");
+                    JOptionPane.showMessageDialog(this, "🗑️ Rute dihapus!");
                     loadTable();
                     clearForm();
                 }
@@ -139,11 +150,21 @@ public class RouteForm extends JFrame {
         });
     }
 
+    private JButton createButton(String text, Color color) {
+        JButton btn = new JButton(text);
+        btn.setBackground(color);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(110, 35));
+        return btn;
+    }
+
     private Route getRouteFromForm(boolean includeId) {
         String origin = cbOrigin.getSelectedItem().toString();
         String dest = cbDestination.getSelectedItem().toString();
         LocalDateTime time = LocalDateTime.parse(tfDeparture.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        double price = ((Integer) spPrice.getValue()).doubleValue(); // ✅ aman
+        double price = ((Integer) spPrice.getValue()).doubleValue();
         int busIndex = cbBus.getSelectedIndex();
         int busId = busList.get(busIndex).getId();
 
